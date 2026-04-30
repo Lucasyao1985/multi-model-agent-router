@@ -29,51 +29,74 @@ class ModelConfig:
     supports_extended_thinking: bool = False
 
 
-# Model registry — update pricing as needed
+# Model registry — free models on OpenRouter (all pricing = $0)
+# openrouter/free is an auto-router that picks any available free model
 MODEL_REGISTRY = {
-    "claude-sonnet": ModelConfig(
-        model_id="anthropic/claude-sonnet-4-5",
-        display_name="Claude Sonnet 4.5",
-        cost_per_1k_input=0.003,
-        cost_per_1k_output=0.015,
+    "openrouter-free": ModelConfig(
+        model_id="openrouter/free",
+        display_name="OpenRouter Free Auto",
+        cost_per_1k_input=0.0,
+        cost_per_1k_output=0.0,
         max_tokens=8192,
-        supports_extended_thinking=True,
     ),
-    "claude-haiku": ModelConfig(
-        model_id="anthropic/claude-haiku-3-5",
-        display_name="Claude Haiku 3.5",
-        cost_per_1k_input=0.0008,
-        cost_per_1k_output=0.004,
+    "hermes-405b": ModelConfig(
+        model_id="nousresearch/hermes-3-llama-3.1-405b:free",
+        display_name="Hermes 3 405B",
+        cost_per_1k_input=0.0,
+        cost_per_1k_output=0.0,
+        max_tokens=8192,
+    ),
+    "nemotron-120b": ModelConfig(
+        model_id="nvidia/nemotron-3-super-120b-a12b:free",
+        display_name="Nemotron 3 Super 120B",
+        cost_per_1k_input=0.0,
+        cost_per_1k_output=0.0,
+        max_tokens=8192,
+    ),
+    "qwen3-coder": ModelConfig(
+        model_id="qwen/qwen3-coder:free",
+        display_name="Qwen3 Coder",
+        cost_per_1k_input=0.0,
+        cost_per_1k_output=0.0,
+        max_tokens=8192,
+    ),
+    "llama-70b": ModelConfig(
+        model_id="meta-llama/llama-3.3-70b-instruct:free",
+        display_name="Llama 3.3 70B",
+        cost_per_1k_input=0.0,
+        cost_per_1k_output=0.0,
+        max_tokens=8192,
+    ),
+    "gemma4-31b": ModelConfig(
+        model_id="google/gemma-4-31b-it:free",
+        display_name="Gemma 4 31B",
+        cost_per_1k_input=0.0,
+        cost_per_1k_output=0.0,
+        max_tokens=8192,
+    ),
+    "gemma3-12b": ModelConfig(
+        model_id="google/gemma-3-12b-it:free",
+        display_name="Gemma 3 12B",
+        cost_per_1k_input=0.0,
+        cost_per_1k_output=0.0,
         max_tokens=4096,
     ),
-    "deepseek-chat": ModelConfig(
-        model_id="deepseek/deepseek-chat",
-        display_name="DeepSeek V3",
-        cost_per_1k_input=0.00027,
-        cost_per_1k_output=0.0011,
-        max_tokens=8192,
-    ),
-    "deepseek-r1": ModelConfig(
-        model_id="deepseek/deepseek-r1",
-        display_name="DeepSeek R1",
-        cost_per_1k_input=0.00055,
-        cost_per_1k_output=0.00219,
-        max_tokens=8192,
-    ),
-    "gemini-flash": ModelConfig(
-        model_id="google/gemini-2.0-flash-001",
-        display_name="Gemini 2.0 Flash",
-        cost_per_1k_input=0.0001,
-        cost_per_1k_output=0.0004,
-        max_tokens=8192,
+    "gemma3-4b": ModelConfig(
+        model_id="google/gemma-3-4b-it:free",
+        display_name="Gemma 3 4B",
+        cost_per_1k_input=0.0,
+        cost_per_1k_output=0.0,
+        max_tokens=4096,
     ),
 }
 
-# Routing table: complexity → [preferred, fallback1, fallback2]
+# Routing table: complexity → [preferred, fallback1, fallback2, ...]
+# Specific models preferred when available, openrouter/free as reliable fallback
+# Note: specific free models may be rate-limited; openrouter/free auto-routes to any available free model
 ROUTING_TABLE = {
-    TaskComplexity.LOW: ["gemini-flash", "deepseek-chat", "claude-haiku"],
-    TaskComplexity.MEDIUM: ["deepseek-chat", "deepseek-r1", "claude-haiku"],
-    TaskComplexity.HIGH: ["claude-sonnet", "deepseek-r1", "deepseek-chat"],
+    TaskComplexity.LOW: ["gemma3-4b", "openrouter-free", "gemma3-12b"],
+    TaskComplexity.MEDIUM: ["qwen3-coder", "openrouter-free", "gemma4-31b"],
+    TaskComplexity.HIGH: ["hermes-405b", "openrouter-free", "nemotron-120b"],
 }
 
 # Keywords that bump up complexity

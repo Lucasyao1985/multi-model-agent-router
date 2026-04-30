@@ -117,7 +117,7 @@ class OpenRouterClient:
             if idx > 0:
                 fallback_triggered = True
                 logger.warning(f"Falling back to {model.display_name} after error: {last_error}")
-                time.sleep(1)
+                time.sleep(3)
 
             try:
                 t0 = time.monotonic()
@@ -127,7 +127,10 @@ class OpenRouterClient:
                 usage = data.get("usage", {})
                 input_tokens = usage.get("prompt_tokens", 0)
                 output_tokens = usage.get("completion_tokens", 0)
-                content = data["choices"][0]["message"]["content"]
+                content = data["choices"][0]["message"].get("content") or ""
+                if not content:
+                    # Some models return reasoning/thinking instead of content
+                    content = data["choices"][0]["message"].get("reasoning") or str(data["choices"][0]["message"])
                 cost = self._estimate_cost(model, input_tokens, output_tokens)
 
                 # Update global stats
